@@ -30,7 +30,7 @@ defmodule AniminaWeb.AniminaComponents do
     <div class="rotate-[12deg]" />
     <div class="rotate-[0deg]" />
     <div
-      class="border border-purple-400 w-full rounded-lg bg-blue-100 px-4 py-3.5 flex items-start justify-between gap-8 drop-shadow xs:justify-start "
+      class="border border-purple-400 md:w-[50%] w-[100%] mx-auto  rounded-lg bg-blue-100 px-4 py-3.5 flex items-start justify-between gap-8 drop-shadow xs:justify-start "
       phx-no-format
     >
       <%= unless Enum.empty?(@avatars_urls) do %>
