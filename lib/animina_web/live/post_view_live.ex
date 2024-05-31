@@ -24,7 +24,7 @@ defmodule AniminaWeb.PostViewLive do
       )
     end
 
-    user = User.by_username!(username)
+    user = User.by_username!(username, not_found_error?: false)
 
     socket =
       if user == nil do
