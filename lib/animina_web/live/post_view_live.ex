@@ -1,12 +1,19 @@
 defmodule AniminaWeb.PostViewLive do
   use AniminaWeb, :live_view
 
+  alias Animina.Accounts.User
   alias Animina.GenServers.ProfileViewCredits
   alias Animina.Narratives.Post
   alias Phoenix.PubSub
 
+  use Timex
+
   @impl true
-  def mount(%{"slug" => slug}, %{"language" => language} = _session, socket) do
+  def mount(
+        %{"slug" => slug, "username" => username, "year" => year, "day" => day, "month" => month},
+        %{"language" => language} = _session,
+        socket
+      ) do
     if connected?(socket) && socket.assigns.current_user != nil do
       PubSub.subscribe(Animina.PubSub, "credits")
       PubSub.subscribe(Animina.PubSub, "messages")
@@ -17,14 +24,30 @@ defmodule AniminaWeb.PostViewLive do
       )
     end
 
-    post = Post.by_slug!(slug, not_found_error?: false)
+    user = User.by_username!(username)
 
     socket =
-      socket
-      |> assign(language: language)
-      |> assign(post: post)
-      |> assign(active_tab: :home)
-      |> assign(error: nil)
+      if user == nil do
+        socket
+        |> assign(language: language)
+        |> assign(post: nil)
+        |> assign(active_tab: :home)
+        |> assign(error: nil)
+      else
+        date = Timex.parse!("#{year}-#{month}-#{day}", "{YYYY}-{0M}-{D}")
+
+        post =
+          Post.by_slug_user_and_date!(slug, user.id, date,
+            not_found_error?: false,
+            load: [:user, :url]
+          )
+
+        socket
+        |> assign(language: language)
+        |> assign(post: post)
+        |> assign(active_tab: :home)
+        |> assign(error: nil)
+      end
 
     {:ok, socket}
   end
